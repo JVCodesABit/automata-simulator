@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Plus, GitBranch, Trash2, MousePointer2,
-  ChevronRight, Network, X, Hash,
+  ChevronRight, X,
 } from 'lucide-react';
 
 function SidebarButton({ onClick, icon: Icon, label, active, variant = 'default', disabled }) {
@@ -487,33 +487,23 @@ export default function Sidebar({
 
         {/* Footer stats */}
         <div
-          className="px-4 py-3 flex items-center gap-3 shrink-0"
+          className="px-3 py-2.5 flex items-center gap-2 shrink-0"
           style={{
             borderTop: '1px solid #1a2d47',
             background: '#000000',
           }}
         >
-          <div className="flex items-center gap-1.5">
-            <Network size={10} style={{ color: '#eef0f1' }} />
-            <span style={{ fontSize: 11, color: '#dce4ec', fontWeight: 500 }}>
-              {states.length} states
-            </span>
-          </div>
-          <span style={{ color: '#1c1c1c', fontSize: 12 }}>·</span>
+          <span style={{ fontSize: 11, color: '#dce4ec', fontWeight: 500 }}>
+            {states.length} states
+          </span>
+          <span style={{ color: '#2a2a2a', fontSize: 11 }}>·</span>
           <span style={{ fontSize: 11, color: '#e3e9ee', fontWeight: 500 }}>
             {transitions.length} transitions
           </span>
-          {alphabet.length >= 0 && (
-            <>
-              <span style={{ color: '#1c1c1c', fontSize: 12 }}>·</span>
-              <div className="flex items-center gap-1">
-                <Hash size={9} style={{ color: '#f1f4f7' }} />
-                <span style={{ fontSize: 11, color: '#f7fbff', fontWeight: 500 }}>
-                  {alphabet.length} alphabets
-                </span>
-              </div>
-            </>
-          )}
+          <span style={{ color: '#2a2a2a', fontSize: 11 }}>·</span>
+          <span style={{ fontSize: 11, color: '#f7fbff', fontWeight: 500 }}>
+            {alphabet.length} alphabets
+          </span>
         </div>
       </aside>
     </>

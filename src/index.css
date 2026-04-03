@@ -75,6 +75,16 @@ html, body, #root {
   color: var(--accent-cyan) !important;
   fill: var(--accent-cyan) !important;
 }
+
+/* Keep React Flow controls on-screen on mobile */
+@media (max-width: 767px) {
+  .react-flow__controls {
+    bottom: 56px !important;
+    left: auto !important;
+    right: 8px !important;
+    top: auto !important;
+  }
+}
 .react-flow__handle {
   background: transparent !important;
   border: none !important;
@@ -173,13 +183,16 @@ html, body, #root {
 /* Desktop: sidebar is always visible inline */
 @media (min-width: 768px) {
   .sidebar-panel {
-    width: 15.5rem; /* w-62 */
+    width: fit-content;
+    min-width: 13rem;
+    max-width: 18rem;
     flex-shrink: 0;
     display: flex;
     flex-direction: column;
     overflow-y: auto;
     overflow-x: hidden;
     position: relative;
+    white-space: nowrap;
   }
   .sidebar-backdrop {
     display: none !important;
@@ -222,9 +235,25 @@ html, body, #root {
 }
 
 @media (max-width: 767px) {
+  /* Fix the simulation log to the bottom of the viewport on mobile */
+  .simlog-container {
+    position: fixed !important;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 90;
+    border-top: 1px solid #1a2c45;
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.5);
+  }
+
   .simlog-scroll {
-    height: calc(35vh - 44px);
-    max-height: 232px;
+    height: calc(40vh - 44px);
+    max-height: 260px;
+  }
+
+  /* Add bottom padding so canvas content isn't hidden behind the fixed log */
+  .canvas-wrapper {
+    padding-bottom: 48px;
   }
 }
 

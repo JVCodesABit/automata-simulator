@@ -393,7 +393,7 @@ export default function App() {
           onClose={() => setSidebarOpen(false)}
         />
 
-        <div className="flex flex-col flex-1 overflow-hidden">
+        <div className="flex flex-col flex-1 overflow-hidden canvas-wrapper">
           <Canvas
             states={states}
             transitions={transitions}
