@@ -1,0 +1,169 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg-deep: #050912;
+  --bg-base: #0a1120;
+  --bg-surface: #0f1a2e;
+  --bg-raised: #162035;
+  --border: #1e2d4a;
+  --border-bright: #2d4a6e;
+  --text-primary: #e2e8f0;
+  --text-secondary: #64748b;
+  --text-muted: #3a4a5e;
+  --accent-cyan: #00e5ff;
+  --accent-purple: #8b5cf6;
+  --accent-green: #4ade80;
+  --accent-red: #f87171;
+  --accent-amber: #fbbf24;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background: #000;
+  color: var(--text-primary);
+  font-family: 'Exo 2', sans-serif;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-base);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-bright);
+  border-radius: 3px;
+}
+
+/* React Flow overrides */
+.react-flow__renderer {
+  background: transparent !important;
+}
+.react-flow__background {
+  --xy-background-color: var(--bg-deep);
+}
+.react-flow__edge-path {
+  stroke: var(--border-bright);
+  stroke-width: 1.5;
+}
+.react-flow__controls {
+  background: var(--bg-surface) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.4) !important;
+  overflow: hidden;
+}
+.react-flow__controls-button {
+  background: var(--bg-surface) !important;
+  border-color: var(--border) !important;
+  color: var(--text-secondary) !important;
+  fill: var(--text-secondary) !important;
+}
+.react-flow__controls-button:hover {
+  background: var(--bg-raised) !important;
+  color: var(--accent-cyan) !important;
+  fill: var(--accent-cyan) !important;
+}
+.react-flow__handle {
+  background: transparent !important;
+  border: none !important;
+  width: 10px !important;
+  height: 10px !important;
+  min-width: 10px !important;
+  min-height: 10px !important;
+}
+.react-flow__node {
+  cursor: default !important;
+}
+.react-flow__node.nopan {
+  cursor: grab !important;
+}
+
+/* Custom glow classes */
+.glow-cyan {
+  box-shadow: 0 0 15px rgba(0, 229, 255, 0.5), 0 0 30px rgba(0, 229, 255, 0.25);
+}
+.glow-green {
+  box-shadow: 0 0 15px rgba(74, 222, 128, 0.5), 0 0 30px rgba(74, 222, 128, 0.25);
+}
+.glow-red {
+  box-shadow: 0 0 15px rgba(248, 113, 113, 0.4), 0 0 30px rgba(248, 113, 113, 0.2);
+}
+.glow-purple {
+  box-shadow: 0 0 15px rgba(139, 92, 246, 0.5), 0 0 30px rgba(139, 92, 246, 0.25);
+}
+
+/* Animated grid background */
+.canvas-bg {
+  background-image:
+    radial-gradient(circle at 50% 50%, rgba(0,229,255,0.03) 0%, transparent 70%),
+    radial-gradient(circle at 80% 20%, rgba(139,92,246,0.04) 0%, transparent 50%);
+  background-color: var(--bg-deep);
+}
+
+/* Input custom */
+.sim-input {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  font-family: 'Space Mono', monospace;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.sim-input:focus {
+  outline: none;
+  border-color: var(--accent-cyan);
+  box-shadow: 0 0 0 2px rgba(0,229,255,0.15);
+}
+
+/* Tooltip */
+.tooltip {
+  position: relative;
+}
+.tooltip::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--bg-raised);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  font-size: 11px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s;
+  z-index: 100;
+}
+.tooltip:hover::after {
+  opacity: 1;
+}
+
+/* Toast notification */
+.toast-enter {
+  animation: toast-in 0.3s cubic-bezier(0.21, 1.02, 0.73, 1) forwards;
+}
+.toast-exit {
+  animation: toast-out 0.3s ease forwards;
+}
+@keyframes toast-in {
+  from { transform: translateX(100%) scale(0.9); opacity: 0; }
+  to   { transform: translateX(0) scale(1); opacity: 1; }
+}
+@keyframes toast-out {
+  from { transform: translateX(0) scale(1); opacity: 1; }
+  to   { transform: translateX(100%) scale(0.9); opacity: 0; }
+}
