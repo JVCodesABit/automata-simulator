@@ -67,6 +67,9 @@ export default function App() {
   const [canvasMode, setCanvasMode] = useState('select');
   const [pendingFrom, setPendingFrom] = useState(null);
 
+  // Mobile sidebar
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
   // Transition modal
   const [transitionModal, setTransitionModal] = useState(null); // { from, to } | null
 
@@ -365,6 +368,7 @@ export default function App() {
         isAtLastStep={isAtLastStep}
         simRunMode={simRunMode}
         onSimRunModeChange={setSimRunMode}
+        onToggleSidebar={() => setSidebarOpen(prev => !prev)}
       />
 
       <div className="flex flex-1 overflow-hidden">
@@ -385,6 +389,8 @@ export default function App() {
           alphabet={alphabet}
           onAddAlphabetSymbol={addAlphabetSymbol}
           onRemoveAlphabetSymbol={removeAlphabetSymbol}
+          isOpen={sidebarOpen}
+          onClose={() => setSidebarOpen(false)}
         />
 
         <div className="flex flex-col flex-1 overflow-hidden">

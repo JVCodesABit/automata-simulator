@@ -5,22 +5,6 @@ import {
   CheckCircle2, XCircle, Loader2, Circle,
 } from 'lucide-react';
 
-/* ─── Premium Dark Mode Token System ──────────────────────────────────────────
-   Base:    #080d14  (near-black with blue tint)
-   Surface: #0d1520  (panel bg)
-   Raised:  #111d2e  (card / row hover)
-   Border:  #1a2c45  (subtle dividers)
-   Muted:   #2e4a6a  (de-emphasized text / icons)
-   Body:    #7fa8cc  (secondary text — readable, not harsh)
-   High:    #c8dff0  (primary readable text)
-   Bright:  #e8f4ff  (headings / labels)
-
-   Accent Cyan:  #29d4f5  (active state — vivid but not overexposed)
-   Accent Green: #34d399  (accepted)
-   Accent Red:   #f87171  (rejected / dead)
-   Accent Amber: #fbbf24  (step numbers)
-── ─────────────────────────────────────────────────────────────────────────── */
-
 function StepRow({ step, isCurrent, isCompleted }) {
   const isDeadStep = step.dead;
 
@@ -64,7 +48,7 @@ function StepRow({ step, isCurrent, isCompleted }) {
       initial={{ opacity: 0, x: -6 }}
       animate={{ opacity: rowOpacity, x: 0 }}
       transition={{ duration: 0.18 }}
-      className="flex items-center gap-3 px-4 py-2 text-xs transition-all"
+      className="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2 text-xs transition-all"
       style={{
         background: bg,
         borderLeft: `2px solid ${borderColor}`,
@@ -72,7 +56,7 @@ function StepRow({ step, isCurrent, isCompleted }) {
     >
       {/* Step number */}
       <span
-        className="font-mono shrink-0 w-6 text-right tabular-nums"
+        className="font-mono shrink-0 w-5 sm:w-6 text-right tabular-nums"
         style={{
           fontSize: 11,
           fontWeight: 700,
@@ -113,7 +97,7 @@ function StepRow({ step, isCurrent, isCompleted }) {
 
       {/* Divider */}
       <div
-        className="w-px h-4 shrink-0"
+        className="w-px h-4 shrink-0 hidden sm:block"
         style={{ background: isCurrent ? '#1a3050' : '#b8c5d4' }}
       />
 
@@ -144,9 +128,9 @@ function StepRow({ step, isCurrent, isCompleted }) {
         )}
       </div>
 
-      {/* Description */}
+      {/* Description — truncated and hidden on very small screens */}
       <span
-        className="ml-auto shrink-0 max-w-[220px] text-right truncate"
+        className="ml-auto shrink-0 max-w-[120px] sm:max-w-[220px] text-right truncate hidden xs:inline"
         style={{
           fontSize: 11,
           color: descColor,
@@ -179,9 +163,9 @@ export default function SimulationLog({
 
   return (
     <motion.div
-      animate={{ height: collapsed ? 44 : 320 }}
+      animate={{ height: collapsed ? 44 : 'clamp(160px, 35vh, 320px)' }}
       transition={{ duration: 0.25, ease: 'easeInOut' }}
-      className="shrink-0 overflow-hidden"
+      className="simlog-container shrink-0 overflow-hidden"
       style={{
         borderTop: '1px solid #1a2c45',
         background: '#000000',
@@ -189,7 +173,7 @@ export default function SimulationLog({
     >
       {/* ── Header ── */}
       <div
-        className="flex items-center gap-2.5 px-4 h-11 shrink-0 cursor-pointer select-none"
+        className="flex items-center gap-2 sm:gap-2.5 px-3 sm:px-4 h-11 shrink-0 cursor-pointer select-none"
         onClick={() => setCollapsed(c => !c)}
         style={{
           borderBottom: collapsed ? 'none' : '1px solid #1a2c45',
@@ -208,7 +192,8 @@ export default function SimulationLog({
             fontFamily: 'inherit',
           }}
         >
-          Simulation Log
+          <span className="hidden sm:inline">Simulation Log</span>
+          <span className="sm:hidden">Log</span>
         </span>
 
         {hasData && (
@@ -241,7 +226,8 @@ export default function SimulationLog({
           >
             <CheckCircle2 size={11} style={{ color: '#34d399' }} />
             <span style={{ fontSize: 11, fontWeight: 700, color: '#34d399', letterSpacing: '0.06em' }}>
-              ACCEPTED
+              <span className="hidden sm:inline">ACCEPTED</span>
+              <span className="sm:hidden">✓</span>
             </span>
           </div>
         )}
@@ -255,7 +241,8 @@ export default function SimulationLog({
           >
             <XCircle size={11} style={{ color: '#f87171' }} />
             <span style={{ fontSize: 11, fontWeight: 700, color: '#f87171', letterSpacing: '0.06em' }}>
-              REJECTED
+              <span className="hidden sm:inline">REJECTED</span>
+              <span className="sm:hidden">✗</span>
             </span>
           </div>
         )}
@@ -278,9 +265,8 @@ export default function SimulationLog({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.15 }}
-            className="overflow-y-auto"
+            className="overflow-y-auto simlog-scroll"
             style={{
-              height: 276,
               /* Custom scrollbar */
               scrollbarWidth: 'thin',
               scrollbarColor: '#1a2c45 transparent',

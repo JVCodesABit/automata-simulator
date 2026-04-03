@@ -1,8 +1,9 @@
-import { useCallback } from 'react';
-import { motion } from 'framer-motion';
+import { useCallback, useState, useRef, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   Play, Pause, SkipForward, RotateCcw,
   Cpu, Zap, AlertCircle, CheckCircle2, XCircle,
+  Menu, ChevronDown, Repeat, SkipBack,
 } from 'lucide-react';
 
 const SPEEDS = [
@@ -15,7 +16,7 @@ const SPEEDS = [
 function ModeToggle({ mode, onModeChange }) {
   return (
     <div
-      className="flex rounded-xl overflow-hidden"
+      className="flex rounded-xl overflow-hidden shrink-0"
       style={{ background: 'rgba(15,26,46,0.8)', border: '1px solid #1e2d4a' }}
     >
       {['DFA', 'NFA'].map(m => (
@@ -80,13 +81,13 @@ function SimButton({ onClick, disabled, title, icon: Icon, variant = 'default', 
 
 function SimRunModeToggle({ mode, onModeChange, disabled }) {
   const modes = [
-    { label: 'Continuous', value: 'continuous' },
-    { label: 'Discrete', value: 'discrete' },
+    { label: 'Continuous', shortLabel: 'Cont.', value: 'continuous', icon: Repeat },
+    { label: 'Discrete', shortLabel: 'Step', value: 'discrete', icon: SkipBack },
   ];
 
   return (
     <div
-      className="flex rounded-lg overflow-hidden"
+      className="flex rounded-lg overflow-hidden shrink-0"
       style={{
         border: '1px solid #1e2d4a',
         background: 'rgba(15,26,46,0.8)',
@@ -113,6 +114,123 @@ function SimRunModeToggle({ mode, onModeChange, disabled }) {
   );
 }
 
+/* Compact mobile dropdown for sim run mode */
+function SimRunModeDropdown({ mode, onModeChange, disabled }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef(null);
+  const btnRef = useRef(null);
+  const [pos, setPos] = useState({ top: 0, left: 0 });
+
+  // Close on outside click
+  useEffect(() => {
+    if (!open) return;
+    const handler = (e) => {
+      if (ref.current && !ref.current.contains(e.target)) setOpen(false);
+    };
+    document.addEventListener('pointerdown', handler);
+    return () => document.removeEventListener('pointerdown', handler);
+  }, [open]);
+
+  // Calculate position when opening
+  const handleToggle = () => {
+    if (disabled) return;
+    if (!open && btnRef.current) {
+      const rect = btnRef.current.getBoundingClientRect();
+      const dropdownWidth = 140;
+      let left = rect.left;
+      // Prevent right-edge overflow
+      if (left + dropdownWidth > window.innerWidth - 8) {
+        left = window.innerWidth - dropdownWidth - 8;
+      }
+      setPos({ top: rect.bottom + 4, left });
+    }
+    setOpen(o => !o);
+  };
+
+  const modes = [
+    { label: 'Continuous', value: 'continuous', icon: Repeat },
+    { label: 'Discrete', value: 'discrete', icon: SkipBack },
+  ];
+  const current = modes.find(m => m.value === mode) || modes[0];
+
+  return (
+    <div ref={ref}>
+      <button
+        ref={btnRef}
+        onClick={handleToggle}
+        disabled={disabled}
+        className="flex items-center gap-1 px-2 py-1.5 rounded-lg text-[10px] font-bold font-mono transition-all"
+        style={{
+          background: 'rgba(15,26,46,0.8)',
+          border: '1px solid #1e2d4a',
+          color: '#00e5ff',
+          opacity: disabled ? 0.4 : 1,
+          cursor: disabled ? 'not-allowed' : 'pointer',
+        }}
+      >
+        <current.icon size={11} />
+        <span>{current.label.slice(0, 4)}.</span>
+        <ChevronDown
+          size={10}
+          style={{
+            transform: open ? 'rotate(180deg)' : 'rotate(0)',
+            transition: 'transform 0.2s',
+          }}
+        />
+      </button>
+
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ opacity: 0, y: -4, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -4, scale: 0.95 }}
+            transition={{ duration: 0.15 }}
+            className="fixed rounded-lg overflow-hidden z-[9999]"
+            style={{
+              top: pos.top,
+              left: pos.left,
+              background: '#0d1520',
+              border: '1px solid #1e2d4a',
+              boxShadow: '0 8px 24px rgba(0,0,0,0.6)',
+              minWidth: 140,
+            }}
+          >
+            {modes.map(m => {
+              const Icon = m.icon;
+              return (
+                <button
+                  key={m.value}
+                  onClick={() => { onModeChange(m.value); setOpen(false); }}
+                  className="flex items-center gap-2 w-full px-3 py-2 text-[11px] font-bold font-mono transition-all"
+                  style={{
+                    color: mode === m.value ? '#00e5ff' : '#c8d8e8',
+                    background: mode === m.value ? 'rgba(0,229,255,0.08)' : 'transparent',
+                    borderBottom: '1px solid #1a2c45',
+                  }}
+                >
+                  <Icon size={12} />
+                  {m.label}
+                </button>
+              );
+            })}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+/* ── Vertical divider — hidden on mobile ── */
+function Divider() {
+  return (
+    <div
+      className="w-px h-6 mx-1 shrink-0 hidden md:block"
+      style={{ background: '#fafbfcff' }}
+    />
+  );
+}
+
 export default function Navbar({
   mode, onModeChange,
   inputString, onInputChange,
@@ -123,6 +241,7 @@ export default function Navbar({
   simSpeed, onSpeedChange,
   isAtLastStep,
   simRunMode, onSimRunModeChange,
+  onToggleSidebar,
 }) {
   const isRunning = simStatus === 'running';
   const isIdle = simStatus === 'idle';
@@ -131,14 +250,28 @@ export default function Navbar({
 
   return (
     <header
-      className="flex items-center gap-3 px-4 h-14 shrink-0"
+      className="navbar-header flex flex-wrap items-center gap-2 md:gap-3 px-3 md:px-4 py-2 md:py-0 md:h-14 shrink-0"
       style={{
         borderBottom: '1px solid #1e2d4a',
         boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
       }}
     >
+      {/* Mobile sidebar toggle */}
+      <button
+        className="md:hidden flex items-center justify-center w-9 h-9 rounded-xl shrink-0"
+        onClick={onToggleSidebar}
+        style={{
+          background: 'rgba(22,32,53,0.8)',
+          border: '1px solid #1e2d4a',
+          color: '#d8dde4',
+        }}
+        title="Toggle sidebar"
+      >
+        <Menu size={16} />
+      </button>
+
       {/* Logo / Title */}
-      <div className="flex items-center gap-2.5 mr-3">
+      <div className="flex items-center gap-2.5 mr-1 md:mr-3 shrink-0">
         <div
           className="w-7 h-7 rounded-lg flex items-center justify-center"
           style={{
@@ -149,29 +282,23 @@ export default function Navbar({
           <Cpu size={14} style={{ color: '#00e5ff' }} />
         </div>
         <span
-          className="text-sm font-semibold tracking-tight"
+          className="text-sm font-semibold tracking-tight hidden sm:inline"
           style={{ color: '#e2e8f0', fontFamily: 'Exo 2' }}
         >
           Automata<span style={{ color: '#00e5ff' }}>.</span>sim
         </span>
       </div>
 
-      <div
-        className="w-px h-6 mx-1 shrink-0"
-        style={{ background: '#fafbfcff' }}
-      />
+      <Divider />
 
       {/* Mode toggle */}
       <ModeToggle mode={mode} onModeChange={onModeChange} />
 
-      <div
-        className="w-px h-6 mx-1 shrink-0"
-        style={{ background: '#f4f4f4ff' }}
-      />
+      <Divider />
 
       {/* Input string */}
-      <div className="flex items-center gap-2 flex-1 max-w-64">
-        <label className="text-xs shrink-0" style={{ color: '#e7eaee', fontFamily: 'Exo 2' }}>
+      <div className="flex items-center gap-2 flex-1 min-w-0 max-w-full md:max-w-64 order-last md:order-none w-full md:w-auto">
+        <label className="text-xs shrink-0 hidden sm:inline" style={{ color: '#e7eaee', fontFamily: 'Exo 2' }}>
           Input:
         </label>
         <input
@@ -184,13 +311,10 @@ export default function Navbar({
         />
       </div>
 
-      <div1
-        className="w-px h-6 mx-1 shrink-0"
-        style={{ background: '#f8f9fdff' }}
-      />
+      <Divider />
 
       {/* Sim controls */}
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 shrink-0">
         {isRunning ? (
           <SimButton onClick={onPause} icon={Pause} variant="primary" title="Pause (Space)" active />
         ) : (
@@ -219,13 +343,10 @@ export default function Navbar({
         />
       </div>
 
-      <div
-        className="w-px h-6 mx-1 shrink-0"
-        style={{ background: '#f5f6f9ff' }}
-      />
+      <Divider />
 
-      {/* Speed control */}
-      <div className="flex items-center gap-1.5">
+      {/* Speed control — hidden on very small screens */}
+      <div className="hidden sm:flex items-center gap-1.5 shrink-0">
         <Zap size={12} style={{ color: '#dee4ec' }} />
         <div
           className="flex rounded-lg overflow-hidden"
@@ -248,8 +369,15 @@ export default function Navbar({
         </div>
       </div>
 
-      {/* Sim Run Mode */}
-      <div className="flex items-center gap-1.5">
+      {/* Sim Run Mode — dropdown on mobile, inline toggle on desktop */}
+      <div className="sm:hidden flex items-center gap-1.5 shrink-0">
+        <SimRunModeDropdown
+          mode={simRunMode}
+          onModeChange={onSimRunModeChange}
+          disabled={!isIdle}
+        />
+      </div>
+      <div className="hidden sm:flex items-center gap-1.5 shrink-0">
         <SimRunModeToggle
           mode={simRunMode}
           onModeChange={onSimRunModeChange}
@@ -272,7 +400,8 @@ export default function Navbar({
             }}
           >
             <CheckCircle2 size={12} />
-            ACCEPTED
+            <span className="hidden sm:inline">ACCEPTED</span>
+            <span className="sm:hidden">✓</span>
           </motion.div>
         )}
         {simResult === 'rejected' && (
@@ -288,7 +417,8 @@ export default function Navbar({
             }}
           >
             <XCircle size={12} />
-            REJECTED
+            <span className="hidden sm:inline">REJECTED</span>
+            <span className="sm:hidden">✗</span>
           </motion.div>
         )}
         {!simResult && !hasStartState && (
@@ -297,7 +427,7 @@ export default function Navbar({
             style={{ color: '#f4f4f4ff' }}
           >
             <AlertCircle size={11} />
-            No start state
+            <span className="hidden sm:inline">No start state</span>
           </div>
         )}
       </div>

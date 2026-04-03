@@ -5,25 +5,6 @@ import {
   ChevronRight, Network, X, Hash,
 } from 'lucide-react';
 
-/* ─── Design Tokens ────────────────────────────────────────────────────────────
-   bg-base:    #000000   deepest background
-   bg-panel:   #000000   sidebar surface
-   bg-raised:  #0f0f0f   cards / row containers
-   bg-row:     #0a0a0a   individual rows
-   border-dim: #1a2d47   subtle dividers
-   border-mid: #243d5c   visible borders
-   text-dim:   #3a5470   very muted (hints, separators)
-   text-muted: #5c7d99   de-emphasized labels
-   text-body:  #8fb8d8   secondary readable text
-   text-high:  #c4dff0   primary text — clear and legible
-   text-bright:#e6f2ff   headings / active labels
-   cyan:       #29d4f5   primary accent
-   violet:     #a78bfa   transition accent
-   green:      #34d399   accept state
-   amber:      #fbbf24   start state
-   red:        #f87171   danger / dead
-──────────────────────────────────────────────────────────────────────────────*/
-
 function SidebarButton({ onClick, icon: Icon, label, active, variant = 'default', disabled }) {
   const themes = {
     default: {
@@ -271,229 +252,270 @@ export default function Sidebar({
   simStatus,
   mode,
   alphabet, onAddAlphabetSymbol, onRemoveAlphabetSymbol,
+  isOpen, onClose,
 }) {
   const isSimulating = simStatus !== 'idle';
 
   return (
-    <aside
-      className="w-62  shrink-0 flex flex-col overflow-y-auto overflow-x-hidden"
-      style={{
-        background: '#000000',
-        borderRight: '1px solid #1a2d47',
-        /* subtle inner-right shadow to separate from canvas */
-        boxShadow: 'inset -1px 0 0 #111111, 2px 0 16px rgba(0,0,0,0.7)',
-      }}
-    >
-      <div className="p-3.5 flex-1">
-
-        {/* Build */}
-        <Section title="Build">
-          <SidebarButton
-            onClick={() => onCanvasModeChange(canvasMode === 'addState' ? 'select' : 'addState')}
-            icon={Plus}
-            label="Add State"
-            active={canvasMode === 'addState'}
-            disabled={isSimulating}
-          />
-          <SidebarButton
-            onClick={() => {
-              if (canvasMode === 'addTransition') {
-                onCancelTransition();
-              } else {
-                onCanvasModeChange('addTransition');
-              }
-            }}
-            icon={GitBranch}
-            label={pendingTransition ? 'Cancel Transition' : 'Add Transition'}
-            active={canvasMode === 'addTransition'}
-            variant="purple"
-            disabled={isSimulating || states.length < 1 || (mode === 'DFA' && alphabet.length === 0)}
-          />
-          <SidebarButton
-            onClick={() => onCanvasModeChange('select')}
-            icon={MousePointer2}
-            label="Select / Pan"
-            active={canvasMode === 'select'}
-          />
-        </Section>
-
-        {/* Alphabet — DFA only */}
-        {mode === 'DFA' && (
-          <AlphabetSection
-            alphabet={alphabet}
-            onAdd={onAddAlphabetSymbol}
-            onRemove={onRemoveAlphabetSymbol}
-            disabled={isSimulating}
+    <>
+      {/* Mobile backdrop overlay */}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="sidebar-backdrop"
+            onClick={onClose}
           />
         )}
+      </AnimatePresence>
 
-        {/* States list */}
-        {states.length > 0 && (
-          <Section title={`States (${states.length})`}>
-            <div
-              className="rounded-xl overflow-hidden"
-              style={{ border: '1px solid #1a2d47', background: '#0a0a0a' }}
-            >
-              {states.map((s, i) => {
-                const nameColor = s.isStart
-                  ? '#29d4f5'
-                  : s.isAccept
-                    ? '#34d399'
-                    : '#8fb8d8';
+      <aside
+        className={`sidebar-panel ${isOpen ? 'sidebar-open' : ''}`}
+        style={{
+          background: '#000000',
+          borderRight: '1px solid #1a2d47',
+          boxShadow: 'inset -1px 0 0 #111111, 2px 0 16px rgba(0,0,0,0.7)',
+        }}
+      >
+        {/* Mobile close button */}
+        <div className="flex items-center justify-between px-3.5 pt-3.5 md:hidden">
+          <span
+            style={{
+              fontSize: 13,
+              fontWeight: 700,
+              color: '#e2e8f0',
+              fontFamily: 'Exo 2',
+            }}
+          >
+            Panel
+          </span>
+          <button
+            onClick={onClose}
+            className="w-8 h-8 flex items-center justify-center rounded-lg"
+            style={{
+              background: 'rgba(248,113,113,0.1)',
+              border: '1px solid rgba(248,113,113,0.3)',
+              color: '#f87171',
+            }}
+          >
+            <X size={14} />
+          </button>
+        </div>
 
-                return (
+        <div className="p-3.5 flex-1 overflow-y-auto overflow-x-hidden">
+
+          {/* Build */}
+          <Section title="Build">
+            <SidebarButton
+              onClick={() => onCanvasModeChange(canvasMode === 'addState' ? 'select' : 'addState')}
+              icon={Plus}
+              label="Add State"
+              active={canvasMode === 'addState'}
+              disabled={isSimulating}
+            />
+            <SidebarButton
+              onClick={() => {
+                if (canvasMode === 'addTransition') {
+                  onCancelTransition();
+                } else {
+                  onCanvasModeChange('addTransition');
+                }
+              }}
+              icon={GitBranch}
+              label={pendingTransition ? 'Cancel Transition' : 'Add Transition'}
+              active={canvasMode === 'addTransition'}
+              variant="purple"
+              disabled={isSimulating || states.length < 1 || (mode === 'DFA' && alphabet.length === 0)}
+            />
+            <SidebarButton
+              onClick={() => onCanvasModeChange('select')}
+              icon={MousePointer2}
+              label="Select / Pan"
+              active={canvasMode === 'select'}
+            />
+          </Section>
+
+          {/* Alphabet — DFA only */}
+          {mode === 'DFA' && (
+            <AlphabetSection
+              alphabet={alphabet}
+              onAdd={onAddAlphabetSymbol}
+              onRemove={onRemoveAlphabetSymbol}
+              disabled={isSimulating}
+            />
+          )}
+
+          {/* States list */}
+          {states.length > 0 && (
+            <Section title={`States (${states.length})`}>
+              <div
+                className="rounded-xl overflow-hidden"
+                style={{ border: '1px solid #1a2d47', background: '#0a0a0a' }}
+              >
+                {states.map((s, i) => {
+                  const nameColor = s.isStart
+                    ? '#29d4f5'
+                    : s.isAccept
+                      ? '#34d399'
+                      : '#8fb8d8';
+
+                  return (
+                    <div
+                      key={s.id}
+                      className="flex items-center gap-2 px-3 py-2"
+                      style={{
+                        borderBottom: i < states.length - 1 ? '1px solid #111111' : 'none',
+                        background: i % 2 === 0 ? 'rgba(255,255,255,0.025)' : 'transparent',
+                      }}
+                    >
+                      <span
+                        className="font-mono"
+                        style={{ fontSize: 13, fontWeight: 700, color: nameColor }}
+                      >
+                        {s.label}
+                      </span>
+                      <div className="flex gap-1 ml-auto">
+                        {s.isStart && (
+                          <StateBadge
+                            label="START"
+                            color="#29d4f5"
+                            bg="rgba(41,212,245,0.1)"
+                            border="rgba(41,212,245,0.25)"
+                          />
+                        )}
+                        {s.isAccept && (
+                          <StateBadge
+                            label="ACC"
+                            color="#34d399"
+                            bg="rgba(52,211,153,0.1)"
+                            border="rgba(52,211,153,0.25)"
+                          />
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              <p style={{ fontSize: 11, color: '#b0b8c2', paddingLeft: 2, marginTop: 3 }}>
+                Hover a state for options · Double-click to rename
+              </p>
+            </Section>
+          )}
+
+          {/* Transitions list */}
+          {transitions.length > 0 && (
+            <Section title={`Transitions (${transitions.length})`}>
+              <div
+                className="rounded-xl overflow-hidden"
+                style={{ border: '1px solid #1a2d47', background: '#0a0a0a' }}
+              >
+                {transitions.map((t, i) => (
                   <div
-                    key={s.id}
-                    className="flex items-center gap-2 px-3 py-2"
+                    key={t.id}
+                    className="flex items-center gap-1.5 px-2.5 py-2 group"
                     style={{
-                      borderBottom: i < states.length - 1 ? '1px solid #111111' : 'none',
+                      borderBottom: i < transitions.length - 1 ? '1px solid #111111' : 'none',
                       background: i % 2 === 0 ? 'rgba(255,255,255,0.025)' : 'transparent',
                     }}
                   >
+                    {/* from */}
                     <span
                       className="font-mono"
-                      style={{ fontSize: 13, fontWeight: 700, color: nameColor }}
+                      style={{ fontSize: 12, fontWeight: 600, color: '#8fb8d8' }}
                     >
-                      {s.label}
+                      {t.from}
                     </span>
-                    <div className="flex gap-1 ml-auto">
-                      {s.isStart && (
-                        <StateBadge
-                          label="START"
-                          color="#29d4f5"
-                          bg="rgba(41,212,245,0.1)"
-                          border="rgba(41,212,245,0.25)"
-                        />
-                      )}
-                      {s.isAccept && (
-                        <StateBadge
-                          label="ACC"
-                          color="#34d399"
-                          bg="rgba(52,211,153,0.1)"
-                          border="rgba(52,211,153,0.25)"
-                        />
-                      )}
-                    </div>
+
+                    <ChevronRight size={9} style={{ color: '#2e4560', flexShrink: 0 }} />
+
+                    {/* label chip */}
+                    <span
+                      className="font-mono"
+                      style={{
+                        fontSize: 11,
+                        fontWeight: 800,
+                        padding: '1px 7px',
+                        borderRadius: 5,
+                        background: 'rgba(41,212,245,0.08)',
+                        border: '1px solid rgba(41,212,245,0.18)',
+                        color: '#29d4f5',
+                        letterSpacing: '0.04em',
+                      }}
+                    >
+                      {t.label}
+                    </span>
+
+                    <ChevronRight size={9} style={{ color: '#2e4560', flexShrink: 0 }} />
+
+                    {/* to */}
+                    <span
+                      className="font-mono"
+                      style={{ fontSize: 12, fontWeight: 600, color: '#8fb8d8' }}
+                    >
+                      {t.to}
+                    </span>
+
+                    <button
+                      onClick={() => onRemoveTransition(t.id)}
+                      disabled={isSimulating}
+                      className="ml-auto opacity-0 group-hover:opacity-100 transition-opacity"
+                      style={{ color: '#f87171' }}
+                      title="Remove transition"
+                    >
+                      <X size={10} />
+                    </button>
                   </div>
-                );
-              })}
-            </div>
-            <p style={{ fontSize: 11, color: '#b0b8c2', paddingLeft: 2, marginTop: 3 }}>
-              Hover a state for options · Double-click to rename
-            </p>
+                ))}
+              </div>
+            </Section>
+          )}
+
+          {/* Clear */}
+          <Section title="Canvas">
+            <SidebarButton
+              onClick={onClear}
+              icon={Trash2}
+              label="Clear All"
+              variant="danger"
+              disabled={isSimulating || (states.length === 0 && transitions.length === 0)}
+            />
           </Section>
-        )}
-
-        {/* Transitions list */}
-        {transitions.length > 0 && (
-          <Section title={`Transitions (${transitions.length})`}>
-            <div
-              className="rounded-xl overflow-hidden"
-              style={{ border: '1px solid #1a2d47', background: '#0a0a0a' }}
-            >
-              {transitions.map((t, i) => (
-                <div
-                  key={t.id}
-                  className="flex items-center gap-1.5 px-2.5 py-2 group"
-                  style={{
-                    borderBottom: i < transitions.length - 1 ? '1px solid #111111' : 'none',
-                    background: i % 2 === 0 ? 'rgba(255,255,255,0.025)' : 'transparent',
-                  }}
-                >
-                  {/* from */}
-                  <span
-                    className="font-mono"
-                    style={{ fontSize: 12, fontWeight: 600, color: '#8fb8d8' }}
-                  >
-                    {t.from}
-                  </span>
-
-                  <ChevronRight size={9} style={{ color: '#2e4560', flexShrink: 0 }} />
-
-                  {/* label chip */}
-                  <span
-                    className="font-mono"
-                    style={{
-                      fontSize: 11,
-                      fontWeight: 800,
-                      padding: '1px 7px',
-                      borderRadius: 5,
-                      background: 'rgba(41,212,245,0.08)',
-                      border: '1px solid rgba(41,212,245,0.18)',
-                      color: '#29d4f5',
-                      letterSpacing: '0.04em',
-                    }}
-                  >
-                    {t.label}
-                  </span>
-
-                  <ChevronRight size={9} style={{ color: '#2e4560', flexShrink: 0 }} />
-
-                  {/* to */}
-                  <span
-                    className="font-mono"
-                    style={{ fontSize: 12, fontWeight: 600, color: '#8fb8d8' }}
-                  >
-                    {t.to}
-                  </span>
-
-                  <button
-                    onClick={() => onRemoveTransition(t.id)}
-                    disabled={isSimulating}
-                    className="ml-auto opacity-0 group-hover:opacity-100 transition-opacity"
-                    style={{ color: '#f87171' }}
-                    title="Remove transition"
-                  >
-                    <X size={10} />
-                  </button>
-                </div>
-              ))}
-            </div>
-          </Section>
-        )}
-
-        {/* Clear */}
-        <Section title="Canvas">
-          <SidebarButton
-            onClick={onClear}
-            icon={Trash2}
-            label="Clear All"
-            variant="danger"
-            disabled={isSimulating || (states.length === 0 && transitions.length === 0)}
-          />
-        </Section>
-      </div>
-
-      {/* Footer stats */}
-      <div
-        className="px-4 py-3 flex items-center gap-3 shrink-0"
-        style={{
-          borderTop: '1px solid #1a2d47',
-          background: '#000000',
-        }}
-      >
-        <div className="flex items-center gap-1.5">
-          <Network size={10} style={{ color: '#eef0f1' }} />
-          <span style={{ fontSize: 11, color: '#dce4ec', fontWeight: 500 }}>
-            {states.length} states
-          </span>
         </div>
-        <span style={{ color: '#1c1c1c', fontSize: 12 }}>·</span>
-        <span style={{ fontSize: 11, color: '#e3e9ee', fontWeight: 500 }}>
-          {transitions.length} transitions
-        </span>
-        {alphabet.length >= 0 && (
-          <>
-            <span style={{ color: '#1c1c1c', fontSize: 12 }}>·</span>
-            <div className="flex items-center gap-1">
-              <Hash size={9} style={{ color: '#f1f4f7' }} />
-              <span style={{ fontSize: 11, color: '#f7fbff', fontWeight: 500 }}>
-                {alphabet.length} alphabets
-              </span>
-            </div>
-          </>
-        )}
-      </div>
-    </aside>
+
+        {/* Footer stats */}
+        <div
+          className="px-4 py-3 flex items-center gap-3 shrink-0"
+          style={{
+            borderTop: '1px solid #1a2d47',
+            background: '#000000',
+          }}
+        >
+          <div className="flex items-center gap-1.5">
+            <Network size={10} style={{ color: '#eef0f1' }} />
+            <span style={{ fontSize: 11, color: '#dce4ec', fontWeight: 500 }}>
+              {states.length} states
+            </span>
+          </div>
+          <span style={{ color: '#1c1c1c', fontSize: 12 }}>·</span>
+          <span style={{ fontSize: 11, color: '#e3e9ee', fontWeight: 500 }}>
+            {transitions.length} transitions
+          </span>
+          {alphabet.length >= 0 && (
+            <>
+              <span style={{ color: '#1c1c1c', fontSize: 12 }}>·</span>
+              <div className="flex items-center gap-1">
+                <Hash size={9} style={{ color: '#f1f4f7' }} />
+                <span style={{ fontSize: 11, color: '#f7fbff', fontWeight: 500 }}>
+                  {alphabet.length} alphabets
+                </span>
+              </div>
+            </>
+          )}
+        </div>
+      </aside>
+    </>
   );
 }
