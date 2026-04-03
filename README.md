@@ -1,128 +1,73 @@
-# Automata Simulator
+# ⚡ DFA / NFA Simulator
 
-A modern, interactive web application for designing and simulating **Deterministic Finite Automata (DFA)** and **Non-Deterministic Finite Automata (NFA)** with smooth animations and a premium dark UI.
+<p align="center">
+  🎯 <b>Design, visualize, and simulate finite automata in real time</b>
+</p>
 
----
-
-## ✨ Features
-
-- 🎨 **Premium dark UI** — retro-futuristic aesthetic with cyan/purple accents
-- 🔁 **DFA & NFA simulation** — toggle between modes with full epsilon-closure support
-- ✏️ **Visual automata builder** — drag states, add transitions interactively
-- ▶️ **Step-by-step simulation** — watch transitions animate in real time
-- ⚡ **Speed control** — 0.5×, 1×, 2×, 3× playback speeds
-- 📋 **Simulation log** — detailed step-by-step trace at the bottom
-- 🎯 **Validation** — instant feedback on DFA conflicts, missing start states, etc.
-- ⌨️ **Keyboard shortcuts** — Space (play/pause), Enter (run), Esc (cancel mode)
+<p align="center">
+  <img src="https://img.shields.io/badge/React-Frontend-blue?logo=react" />
+  <img src="https://img.shields.io/badge/Tailwind-CSS-38B2AC?logo=tailwindcss" />
+  <img src="https://img.shields.io/badge/Framer-Motion-black?logo=framer" />
+  <img src="https://img.shields.io/badge/License-MIT-green" />
+</p>
 
 ---
 
-## 🚀 Getting Started
+## 🧠 Overview
 
-### Prerequisites
+An interactive web-based simulator for **Deterministic (DFA)** and **Non-Deterministic Finite Automata (NFA)** that helps you visualize how strings are processed step-by-step.
 
-- Node.js 18+ and npm
-
-### Installation
-
-```bash
-# Install dependencies
-npm install
-
-# Start development server
-npm run dev
-```
-
-Open `http://localhost:5173` in your browser.
-
-### Build for production
-
-```bash
-npm run build
-npm run preview
-```
+This tool transforms abstract automata concepts into a **clear, intuitive, and interactive experience**.
 
 ---
 
-## 🕹️ How to Use
+## 🚀 Features
 
-### Building an Automaton
+✨ **Interactive Canvas**  
+Create states, draw transitions, and build automata visually.
 
-1. **Add States** — Click "Add State" in the sidebar, then click on the canvas
-2. **Set Start State** — Hover a state → click "S" button that appears
-3. **Set Accept State** — Hover a state → click "A" button to toggle
-4. **Add Transitions** — Click "Add Transition" → click source state → click target state → enter symbol
-5. **Rename States** — Double-click a state label to rename it
-6. **Delete** — Hover a state → click "×" button; or hover a transition in sidebar → click "×"
+🔀 **DFA & NFA Support**  
+Includes full support for **ε-transitions** and multiple active states.
 
-### Simulating
+▶️ **Dual Simulation Modes**  
+- Continuous (auto-run)  
+- Discrete (step-by-step debugging)
 
-1. Enter an input string in the top input field
-2. Press **Play** (or Enter) to start the simulation
-3. Use **Pause** to pause, **Step** to advance one step at a time
-4. Check the bottom log panel for detailed trace output
+🎯 **Real-Time Visualization**  
+- Active states highlighted  
+- Animated transitions  
+- Instant acceptance/rejection feedback  
 
-### Keyboard Shortcuts
+📜 **Simulation Log**  
+Track each step with:
+- Current states  
+- Input progression  
+- Transition details  
 
-| Key | Action |
-|-----|--------|
-| `Enter` | Start simulation |
-| `Space` | Play / Pause |
-| `Esc` | Cancel current mode |
+🎨 **Modern UI/UX**  
+Smooth animations, glowing edges, and a clean dark theme.
 
 ---
 
-## 🧠 DFA vs NFA
+## 🖥️ Demo
 
-| Feature | DFA | NFA |
-|---------|-----|-----|
-| Active states | Exactly 1 | 1 or more |
-| ε-transitions | ❌ | ✅ |
-| Multiple transitions on same symbol | ❌ | ✅ |
+> 🔗 Add your deployed link here (Vercel / Netlify)
 
 ---
 
 ## 🛠️ Tech Stack
 
-- **React 18** — UI framework
-- **@xyflow/react** — Graph visualization (states & transitions)
-- **Framer Motion** — Smooth animations
-- **Tailwind CSS** — Styling
-- **Lucide React** — Icons
-- **Vite** — Build tool
+- ⚛️ **React**
+- 🔗 **React Flow (@xyflow/react)**
+- 🎨 **Tailwind CSS**
+- 🎞️ **Framer Motion**
 
 ---
 
-## 📁 Project Structure
+## 📦 Installation
 
-```
-src/
-├── components/
-│   ├── Navbar.jsx         # Top navigation bar
-│   ├── Sidebar.jsx        # Left control panel
-│   ├── Canvas.jsx         # React Flow canvas
-│   ├── SimulationLog.jsx  # Bottom step log
-│   ├── CustomNode.jsx     # State node renderer
-│   ├── CustomEdge.jsx     # Transition edge renderer
-│   └── TransitionModal.jsx # Modal for transition label
-├── utils/
-│   └── automataEngine.js  # DFA/NFA simulation logic
-├── App.jsx                # Main app + state management
-├── main.jsx               # Entry point
-└── index.css              # Global styles
-```
-
----
-
-## 💡 Tips
-
-- **Self-loops**: Add a transition where source and target are the same state
-- **ε-transitions**: In NFA mode, type `ε` as the transition label (or paste: ε)
-- **Multiple transitions**: Multiple transitions between the same pair of states are automatically merged in the canvas view
-- The first state you add automatically becomes the start state
-
----
-
-## 📄 License
-
-MIT
+```bash
+git clone https://github.com/your-username/your-repo.git
+cd your-repo
+npm install
+npm run dev
