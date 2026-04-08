@@ -130,7 +130,7 @@ function StepRow({ step, isCurrent, isCompleted }) {
 
       {/* Description — truncated and hidden on very small screens */}
       <span
-        className="ml-auto shrink-0 max-w-[120px] sm:max-w-[220px] text-right truncate hidden xs:inline"
+        className="ml-auto shrink-0 max-w-[120px] sm:max-w-[220px] text-right truncate"
         style={{
           fontSize: 11,
           color: descColor,

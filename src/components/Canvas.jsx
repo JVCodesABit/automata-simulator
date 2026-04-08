@@ -92,8 +92,26 @@ export default function Canvas({
       }
     });
 
+    // Detect bidirectional pairs so we can curve them apart
+    const pairKeys = new Set();
+    for (const key of edgeMap.keys()) {
+      const [from, to] = key.split('|||');
+      const reverseKey = `${to}|||${from}`;
+      if (edgeMap.has(reverseKey) && from !== to) {
+        pairKeys.add(key);
+        pairKeys.add(reverseKey);
+      }
+    }
+
     const newEdges = [...edgeMap.values()].map(e => {
       const isActive = e.ids.some(id => activeTransitions.includes(id));
+      const key = `${e.source}|||${e.target}`;
+      // For bidirectional pairs: one edge curves one way, the other curves the opposite
+      // Use lexicographic order to assign consistent direction
+      let curveOffset = 0;
+      if (pairKeys.has(key)) {
+        curveOffset = e.source < e.target ? 30 : -30;
+      }
       return {
         id: e.id,
         source: e.source,
@@ -109,6 +127,7 @@ export default function Canvas({
         data: {
           isActive,
           isSelf: e.isSelf,
+          curveOffset,
         },
         selectable: false,
         focusable: false,

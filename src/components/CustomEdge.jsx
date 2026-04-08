@@ -3,7 +3,6 @@ import {
   BaseEdge,
   EdgeLabelRenderer,
   getBezierPath,
-  getStraightPath,
 } from '@xyflow/react';
 import { motion } from 'framer-motion';
 
@@ -19,6 +18,7 @@ const CustomEdge = memo(({
 }) => {
   const isActive = data?.isActive ?? false;
   const isSelf = data?.isSelf ?? false;
+  const curveOffset = data?.curveOffset ?? 0;
 
   let edgePath, labelX, labelY;
 
@@ -34,6 +34,24 @@ const CustomEdge = memo(({
         ${sourceX + 8} ${startY}`;
     labelX = cx;
     labelY = cy + 6;
+  } else if (curveOffset !== 0) {
+    // Bidirectional edge: offset a quadratic bezier perpendicular to the straight line
+    const midX = (sourceX + targetX) / 2;
+    const midY = (sourceY + targetY) / 2;
+    // Always compute perpendicular from a canonical direction (left-to-right / top-to-bottom)
+    // so both edges of a bidirectional pair curve in opposite directions
+    const canonicalDx = Math.abs(targetX - sourceX) || 1;
+    const canonicalDy = sourceX <= targetX ? (targetY - sourceY) : (sourceY - targetY);
+    const len = Math.sqrt(canonicalDx * canonicalDx + canonicalDy * canonicalDy) || 1;
+    // Perpendicular unit vector (consistent regardless of edge direction)
+    const px = -canonicalDy / len;
+    const py = canonicalDx / len;
+    const ctrlX = midX + px * curveOffset;
+    const ctrlY = midY + py * curveOffset;
+    edgePath = `M ${sourceX} ${sourceY} Q ${ctrlX} ${ctrlY} ${targetX} ${targetY}`;
+    // Label at the curve midpoint (t=0.5 for quadratic bezier)
+    labelX = (sourceX + 2 * ctrlX + targetX) / 4;
+    labelY = (sourceY + 2 * ctrlY + targetY) / 4;
   } else {
     [edgePath, labelX, labelY] = getBezierPath({
       sourceX, sourceY, sourcePosition,
