@@ -1,5 +1,10 @@
 # ⚡ DFA / NFA Simulator
 
+## 🖥️ Demo
+
+> 🔗 automatasim.jvcodes.tech
+-----
+
 <p align="center">
   🎯 <b>Design, visualize, and simulate finite automata in real time</b>
 </p>
@@ -46,12 +51,6 @@ Track each step with:
 
 🎨 **Modern UI/UX**  
 Smooth animations, glowing edges, and a clean dark theme.
-
----
-
-## 🖥️ Demo
-
-> 🔗 Add your deployed link here (Vercel / Netlify)
 
 ---
 
